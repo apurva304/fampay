@@ -1,6 +1,7 @@
 package youtube
 
 import (
+	"fampay/domain"
 	"sync"
 	"time"
 )
@@ -27,15 +28,16 @@ func NewLb(apiKeys []string) (r *loadBalancingMW, err error) {
 	return r, nil
 }
 
-func (svc *loadBalancingMW) Search(query string, publishedAfter time.Time) (err error) {
+func (svc *loadBalancingMW) Search(query string, publishedAfter time.Time) (vidoes []domain.Video, err error) {
 	svc.mtx.RLock()
 	if len(svc.ytClient) < 1 {
 		//limit exceeded for all the provided keys
-		return ErrQuotaExceeded
+		err = ErrQuotaExceeded
+		return
 	}
 
 	index := svc.counter % len(svc.ytClient)
-	err = svc.ytClient[index].Search(query, publishedAfter)
+	vidoes, err = svc.ytClient[index].Search(query, publishedAfter)
 	svc.mtx.RUnlock()
 
 	switch err {

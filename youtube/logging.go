@@ -1,6 +1,7 @@
 package youtube
 
 import (
+	"fampay/domain"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -11,7 +12,7 @@ type loggingMW struct {
 	logger log.Logger
 }
 
-func (l *loggingMW) Search(query string, publishedAfter time.Time) (err error) {
+func (l *loggingMW) Search(query string, publishedAfter time.Time) (videos []domain.Video, err error) {
 	defer func(begin time.Time) {
 		l.logger.Log(
 			"method", "Search",

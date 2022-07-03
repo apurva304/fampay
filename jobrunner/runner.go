@@ -2,6 +2,7 @@ package jobrunner
 
 import (
 	"fampay/youtube"
+	"fmt"
 	"log"
 	"time"
 )
@@ -28,10 +29,11 @@ func (r *runner) run() {
 	for {
 		select {
 		case <-r.ticker.C:
-			err := r.svc.Search(r.query, r.lastSuccessFetchTime)
+			videos, err := r.svc.Search(r.query, r.lastSuccessFetchTime)
 			switch err {
 			case nil:
 				r.lastSuccessFetchTime = time.Now()
+				fmt.Println(videos)
 			case youtube.ErrNotFound:
 			case youtube.ErrQuotaExceeded:
 				//limit exceeded for all the provided keys
