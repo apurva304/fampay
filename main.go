@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fampay/config"
 	runner "fampay/jobrunner"
 	"fampay/youtube"
 	"fmt"
@@ -13,23 +14,28 @@ import (
 )
 
 const (
-	QUERY       = "vlog"
 	RUNNER_FREQ = 10 * time.Second
+	CONFIG_FILE = "config.json"
 )
 
 func main() {
-	quit := make(chan struct{})
-	args := os.Args
-	if len(args) < 2 {
-		panic("API Key not provide")
+	file, err := os.Open(CONFIG_FILE)
+	if err != nil {
+		panic(err)
 	}
-	apiKey := args[1]
-	svc, err := youtube.NewLb([]string{apiKey})
+
+	conf, err := config.New(file)
+	if err != nil {
+		panic(err)
+	}
+
+	quit := make(chan struct{})
+	svc, err := youtube.NewLb(conf.ApiKey)
 	if err != nil {
 		panic(err)
 	}
 	initPubAfterDuration := time.Now().Add(-10 * time.Minute)
-	runner.StartRunner(RUNNER_FREQ, svc, initPubAfterDuration, QUERY, quit)
+	runner.StartRunner(RUNNER_FREQ, svc, initPubAfterDuration, conf.Query, quit)
 
 	var g group.Group
 	// Interupt
