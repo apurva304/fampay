@@ -29,6 +29,11 @@ func NewLb(apiKeys []string) (r *loadBalancingMW, err error) {
 
 func (svc *loadBalancingMW) Search(query string, publishedAfter time.Time) (err error) {
 	svc.mtx.RLock()
+	if len(svc.ytClient) < 1 {
+		//limit exceeded for all the provided keys
+		return ErrQuotaExceeded
+	}
+
 	index := svc.counter % len(svc.ytClient)
 	err = svc.ytClient[index].Search(query, publishedAfter)
 	svc.mtx.RUnlock()
@@ -64,25 +69,3 @@ func (svc *loadBalancingMW) remove(index int) {
 	svc.ytClient = newArr
 	svc.counter++
 }
-
-// func main() {
-// 	lastSuccessFetchTime := time.Now().Add(-10 * time.Minute)
-
-// 	tc := time.NewTicker(1 * time.Second)
-// 	for {
-// 		select {
-// 		case <-tc.C:
-// 			err = svc.Search("music", lastSuccessFetchTime)
-// 			switch err {
-// 			case nil:
-// 				lastSuccessFetchTime = time.Now()
-// 				fmt.Println("success", lastSuccessFetchTime)
-// 			case youtube.ErrNotFound:
-// 			case youtube.ErrQuotaExceeded:
-// 				fmt.Println("limit")
-// 			default:
-// 				panic(err)
-// 			}
-// 		}
-// 	}
-// }
