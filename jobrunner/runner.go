@@ -11,15 +11,17 @@ type runner struct {
 	svc                  youtube.Service
 	lastSuccessFetchTime time.Time
 	query                string
+	quit                 chan struct{}
 }
 
-func StartRunner(runDuration time.Duration, svc youtube.Service, publishAfter time.Time, query string) {
+func StartRunner(runDuration time.Duration, svc youtube.Service, publishAfter time.Time, query string, quit chan struct{}) {
 	r := &runner{
 		ticker:               time.NewTicker(runDuration),
 		svc:                  svc,
 		lastSuccessFetchTime: publishAfter,
+		quit:                 quit,
 	}
-	r.run()
+	go r.run()
 }
 
 func (r *runner) run() {
@@ -34,11 +36,12 @@ func (r *runner) run() {
 			case youtube.ErrQuotaExceeded:
 				//limit exceeded for all the provided keys
 				log.Fatal("Quota Limit Exceeded for all the provided keys")
-				break
 			default:
 				log.Println("Error While Fetching youtube data", err)
 				continue
 			}
+		case <-r.quit:
+			return
 		}
 	}
 }

@@ -16,7 +16,10 @@ var (
 )
 
 const (
-	QOUTA_EXCEEDED = "quotaExceeded"
+	QOUTA_EXCEEDED  = "quotaExceeded"
+	LIST_QUERY_PART = "snippet"
+	TYPE            = "video"
+	ORDER           = "date"
 )
 
 type Service interface {
@@ -45,12 +48,12 @@ func NewService(apiKey string) (*service, error) {
 }
 
 func (svc *service) Search(query string, publishedAfter time.Time) (err error) {
-	req := svc.ytClient.Search.List([]string{"snippet"}).
+	req := svc.ytClient.Search.List([]string{LIST_QUERY_PART}).
 		Q(query).
 		MaxResults(25).
-		Type("video").
+		Type(TYPE).
 		PublishedAfter(publishedAfter.Format(time.RFC3339)).
-		Order("date")
+		Order(ORDER)
 
 	res, err := req.Do()
 	switch {
@@ -72,7 +75,7 @@ func (svc *service) Search(query string, publishedAfter time.Time) (err error) {
 func checkQuotaExceeded(err error) (ok bool) {
 	var gApiErr *googleapi.Error
 	if errors.As(err, &gApiErr) {
-		if len(gApiErr.Errors) > 0 && gApiErr.Errors[0].Reason == "quotaExceeded" {
+		if len(gApiErr.Errors) > 0 && gApiErr.Errors[0].Reason == QOUTA_EXCEEDED {
 			ok = true
 		}
 	}
