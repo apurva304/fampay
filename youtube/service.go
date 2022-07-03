@@ -1,12 +1,22 @@
 package youtube
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"time"
 
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/googleapi/transport"
 	youtube "google.golang.org/api/youtube/v3"
+)
+
+var (
+	ErrNotFound      = errors.New("Videos Not Found")
+	ErrQuotaExceeded = errors.New("Quota Exceeded")
+)
+
+const (
+	QOUTA_EXCEEDED = "quotaExceeded"
 )
 
 type Service interface {
@@ -43,14 +53,28 @@ func (svc *service) Search(query string, publishedAfter time.Time) (err error) {
 		Order("date")
 
 	res, err := req.Do()
-	if err != nil {
-		return err
+	switch {
+	case err == nil:
+		// continue below
+	case checkQuotaExceeded(err):
+		err = ErrQuotaExceeded
+		return
+	default:
+		return
 	}
-	fmt.Println(len(res.Items))
 	if len(res.Items) < 1 {
-		fmt.Println("NOT FOUND")
-		return nil
+		return ErrNotFound
 	}
 
+	return
+}
+
+func checkQuotaExceeded(err error) (ok bool) {
+	var gApiErr *googleapi.Error
+	if errors.As(err, &gApiErr) {
+		if len(gApiErr.Errors) > 0 && gApiErr.Errors[0].Reason == "quotaExceeded" {
+			ok = true
+		}
+	}
 	return
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"fampay/youtube"
 	"os"
-	"time"
 )
 
 var ()
@@ -14,13 +13,9 @@ func main() {
 		panic("API Key not provide")
 	}
 	apiKey := args[1]
-	svc, err := youtube.NewService(apiKey)
+	svc, err := youtube.NewLb([]string{apiKey})
 	if err != nil {
 		panic(err)
 	}
 
-	err = svc.Search("music", time.Now().Add(-60*time.Minute))
-	if err != nil {
-		panic(err)
-	}
 }
