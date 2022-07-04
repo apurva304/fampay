@@ -11,6 +11,8 @@ services:
     build: .
     ports:
       - 3000:3000
+    environment:
+      - mongo_uri=mongodb://mongo_db:27017
     depends_on:
       - mongo_db
 

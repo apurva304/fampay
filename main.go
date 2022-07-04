@@ -28,6 +28,7 @@ const (
 )
 
 func main() {
+	mongoUri := os.Getenv("mongo_uri")
 	file, err := os.Open(CONFIG_FILE)
 	if err != nil {
 		panic(err)
@@ -39,8 +40,10 @@ func main() {
 	}
 
 	logger := log.NewJSONLogger(os.Stdout)
-
-	mongoClient, err := mongo.Connect(context.Background(), options.Client().ApplyURI(conf.MongoUri))
+	if len(mongoUri) < 1 {
+		mongoUri = conf.MongoUri
+	}
+	mongoClient, err := mongo.Connect(context.Background(), options.Client().ApplyURI(mongoUri))
 	if err != nil {
 		panic(err)
 	}
