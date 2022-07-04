@@ -25,6 +25,7 @@ func StartRunner(runDuration time.Duration, svc youtube.Service, publishAfter ti
 		ticker:               time.NewTicker(runDuration),
 		svc:                  svc,
 		lastSuccessFetchTime: publishAfter,
+		query:                query,
 		videoRepo:            videoRepo,
 		logger:               logger,
 		quit:                 quit,

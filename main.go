@@ -71,7 +71,7 @@ func main() {
 	var svc videoservice.Service
 	{
 		svc = videoservice.New(videoRepo)
-		videoservice.NewLoggingMw(svc, log.With(logger, "service", "video"))
+		svc = videoservice.NewLoggingMw(svc, log.With(logger, "service", "video"))
 	}
 
 	httpRouter := videoservice.MakeHandler(svc, logger)
@@ -84,7 +84,7 @@ func main() {
 			Handler: httpRouter,
 		}
 		g.Add(func() error {
-			logger.Log("serverstate", "starting game http server. port:%d \n", conf.HttpPort)
+			logger.Log("serverstate", fmt.Sprintf("starting game http server. port:%d", conf.HttpPort))
 			return httpServer.ListenAndServe()
 		}, func(error) {
 			ctx, cancle := context.WithTimeout(context.Background(), time.Second*5)
