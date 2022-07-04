@@ -35,7 +35,7 @@ func main() {
 		panic(err)
 	}
 	initPubAfterDuration := time.Now().Add(-10 * time.Minute)
-	runner.StartRunner(RUNNER_FREQ, svc, initPubAfterDuration, conf.Query, quit)
+	runner.StartRunner(RUNNER_FREQ, svc, initPubAfterDuration, conf.Query, nil, quit)
 
 	var g group.Group
 	// Interupt
