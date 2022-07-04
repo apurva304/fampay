@@ -1,6 +1,7 @@
 package jobrunner
 
 import (
+	"context"
 	videorepository "fampay/repositories/video"
 	"fampay/youtube"
 	"log"
@@ -34,7 +35,7 @@ func (r *runner) run() {
 			videos, err := r.svc.Search(r.query, r.lastSuccessFetchTime)
 			switch err {
 			case nil:
-				err = r.videoRepo.AddBulk(videos)
+				err = r.videoRepo.AddBulk(context.TODO(), videos)
 				if err != nil {
 					log.Println("Error While Adding Data", err)
 					continue

@@ -12,18 +12,28 @@ var (
 )
 
 type Service interface {
-	Search(ctx context.Context, query string) (videos []domain.Video, err error)
+	Search(ctx context.Context, query string, pageNumber int64, pageItemCount int64) (videos []domain.Video, err error)
 }
 
 type service struct {
 	videoRepo videorepository.Repository
 }
 
-func (svc *service) Search(ctx context.Context, query string) (videos []domain.Video, err error) {
+func (svc *service) Search(ctx context.Context, query string, pageNumber int64, pageItemCount int64) (videos []domain.Video, err error) {
 	if len(query) < 1 {
 		err = ErrInvalidArgument
 		return
 	}
 
-	return svc.videoRepo.Search(query)
+	if pageNumber < 1 {
+		// default pageNumber if not given
+		pageNumber = 1
+	}
+
+	if pageItemCount < 1 {
+		// default pageItemCount if not given
+		pageItemCount = 10
+	}
+
+	return svc.videoRepo.Search(ctx, query, pageNumber, pageItemCount)
 }

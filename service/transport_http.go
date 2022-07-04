@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
@@ -37,16 +38,35 @@ func MakeHandler(svc Service, logger kitlog.Logger) {
 func decodeGetVideoRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	var req getVideoRequest
 	queryMap := r.URL.Query()
-	q, ok := queryMap["query"]
+	queryValue, ok := queryMap["query"]
 	if !ok {
 		err = ErrBadRequest
 		return
 	}
-	if len(q) < 1 {
+	if len(queryValue) < 1 {
 		err = ErrBadRequest
 		return
 	}
-	req.Query = q[0]
+	req.Query = queryValue[0]
+
+	// pageNumber is not mandatory
+	pageNumber, _ := queryMap["pageNumber"]
+	if len(pageNumber) > 0 {
+		req.PageNumber, err = strconv.ParseInt(pageNumber[0], 10, 64)
+		if err != nil {
+			err = ErrBadRequest
+			return
+		}
+	}
+	// pageItemCount is not mandatory
+	pageItemCount, _ := queryMap["pageItemCount"]
+	if len(pageItemCount) > 0 {
+		req.PageItemCount, err = strconv.ParseInt(pageItemCount[0], 10, 64)
+		if err != nil {
+			err = ErrBadRequest
+			return
+		}
+	}
 
 	return req, nil
 }

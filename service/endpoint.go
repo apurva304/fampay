@@ -8,7 +8,9 @@ import (
 )
 
 type getVideoRequest struct {
-	Query string `json:"query"`
+	Query         string `json:"query"`
+	PageNumber    int64  `json:"pageNumber"`
+	PageItemCount int64  `json:"pageItemCount"`
 }
 
 type getVideoResponse struct {
@@ -23,7 +25,7 @@ func (res getVideoResponse) error() string {
 func makeGetVideoEndpoint(svc Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(getVideoRequest)
-		videos, err := svc.Search(ctx, req.Query)
+		videos, err := svc.Search(ctx, req.Query, req.PageNumber, req.PageItemCount)
 		return getVideoResponse{Videos: videos, Err: err}, nil
 	}
 }
