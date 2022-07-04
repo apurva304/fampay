@@ -1,4 +1,4 @@
-package service
+package videoservice
 
 import (
 	"context"
@@ -7,25 +7,25 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
-type getVideoRequest struct {
+type searchRequest struct {
 	Query         string `json:"query"`
 	PageNumber    int64  `json:"pageNumber"`
 	PageItemCount int64  `json:"pageItemCount"`
 }
 
-type getVideoResponse struct {
+type searchResponse struct {
 	Videos []domain.Video
 	Err    error
 }
 
-func (res getVideoResponse) error() string {
+func (res searchResponse) error() string {
 	return res.Err.Error()
 }
 
-func makeGetVideoEndpoint(svc Service) endpoint.Endpoint {
+func makeSearchEndpoint(svc Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(getVideoRequest)
+		req := request.(searchRequest)
 		videos, err := svc.Search(ctx, req.Query, req.PageNumber, req.PageItemCount)
-		return getVideoResponse{Videos: videos, Err: err}, nil
+		return searchResponse{Videos: videos, Err: err}, nil
 	}
 }

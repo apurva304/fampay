@@ -1,4 +1,4 @@
-package service
+package videoservice
 
 import (
 	"context"
@@ -18,25 +18,27 @@ var (
 	ErrBadRequest = errors.New("Bad Request")
 )
 
-func MakeHandler(svc Service, logger kitlog.Logger) {
+func MakeHandler(svc Service, logger kitlog.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
 	getVideoHandler := kithttp.NewServer(
-		makeGetVideoEndpoint(svc),
-		decodeGetVideoRequest,
+		makeSearchEndpoint(svc),
+		decodeSearchRequest,
 		encodeResponse,
 		opts...,
 	)
 
 	r := mux.NewRouter()
 	r.Handle("/videos", getVideoHandler).Methods(http.MethodGet)
+
+	return r
 }
 
-func decodeGetVideoRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	var req getVideoRequest
+func decodeSearchRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	var req searchRequest
 	queryMap := r.URL.Query()
 	queryValue, ok := queryMap["query"]
 	if !ok {

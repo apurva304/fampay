@@ -23,7 +23,7 @@ type repository struct {
 	dbName string
 }
 
-func New(client *mongo.Client, dbName string) *repository {
+func New(client *mongo.Client, dbName string) (*repository, error) {
 	index := mongo.IndexModel{
 		Keys: bson.D{
 			{"title", "text"},
@@ -32,9 +32,9 @@ func New(client *mongo.Client, dbName string) *repository {
 	}
 	_, err := client.Database(dbName).Collection(COLLECTION).Indexes().CreateOne(context.TODO(), index)
 	if err != nil {
-		// mongo.
+		return nil, err
 	}
-	return &repository{}
+	return &repository{client: client, dbName: dbName}, nil
 }
 
 func (repo *repository) Add(ctx context.Context, video domain.Video) (err error) {

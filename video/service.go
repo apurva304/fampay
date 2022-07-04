@@ -1,4 +1,4 @@
-package service
+package videoservice
 
 import (
 	"context"
@@ -17,6 +17,12 @@ type Service interface {
 
 type service struct {
 	videoRepo videorepository.Repository
+}
+
+func New(videoRepo videorepository.Repository) *service {
+	return &service{
+		videoRepo: videoRepo,
+	}
 }
 
 func (svc *service) Search(ctx context.Context, query string, pageNumber int64, pageItemCount int64) (videos []domain.Video, err error) {
