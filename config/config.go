@@ -61,7 +61,7 @@ func defaultConfig() Config {
 		ApiKey:   []string{"<your api key>"},
 		DBName:   "fampay",
 		HttpPort: 3000,
-		MongoUri: "mongodb://localhost:27017",
+		MongoUri: "mongodb://mongo_db:27017",
 	}
 }
 

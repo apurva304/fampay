@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+  mongo_db:
+    container_name: mongo_container
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+
+  fampay:
+    build: .
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_db:
+    driver: local

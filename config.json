@@ -1,7 +1,7 @@
 {
 	"query":"cricket",
 	"apiKey":["<add your keys here multiple keys are supported>"],
-	"mongoUri" :"mongodb://localhost:27017",
+	"mongoUri" :"mongodb://mongo_db:27017",
 	"dbName":"fampay",
 	"httpPort":3000
 }
